@@ -1,0 +1,135 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+.logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #065f46;
+    margin-bottom: 30px;
+}
+
+.semester-select {
+    margin-bottom: 25px;
+}
+
+select {
+    padding: 12px 25px;
+    border-radius: 8px;
+    border: 2px solid #34d399;
+    font-size: 16px;
+}
+
+.subject-card {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid #34d399;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.input-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    justify-content: center;
+}
+
+input {
+    padding: 8px 12px;
+    border: 1px solid #34d399;
+    border-radius: 6px;
+    width: 100px;
+    text-align: center;
+}
+
+button {
+    background: #34d399;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    margin-top: 20px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #10b981;
+}
+
+#result, #creditsResult {
+    margin-top: 25px;
+    padding: 15px;
+    background: rgba(52, 211, 153, 0.15);
+    border-radius: 8px;
+}
+
+.warning {
+    color: #dc2626;
+}
+
+/* Special Cases Styling */
+.special-input-group {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+.input-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.multi-exam-group {
+    display: flex;
+    gap: 10px;
+}
+/* Add this at the bottom of your existing CSS */
+footer {
+    text-align: right;
+    margin-top: 30px;
+    padding: 10px 0;
+    font-size: 0.5em;
+    color: #666;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+footer:hover {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .special-input-group {
+        flex-direction: column;
+    }
+
+    .input-group {
+        flex-wrap: wrap;
+    }
+}
