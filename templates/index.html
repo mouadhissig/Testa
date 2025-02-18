@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tags and ads scripts remain the same -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7392187562215194"
+     crossorigin="anonymous"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0X7398K36L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-0X7398K36L');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semester Grade Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='issig.png') }}" alt="University Logo" class="logo">
+        <h1>📚 Semester Grade Calculator</h1>
+
+        <div class="semester-select">
+            <select id="semesterSelect">
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+            </select>
+        </div>
+
+        <div id="subjectsContainer"></div>
+        <div style="text-align: center;">
+            <button id="calculateButton">Calculate Semester Average</button>
+        </div>
+        <div id="result"></div>
+        <div id="creditsResult"></div>
+
+        <footer>
+            <p>developed by MO20</p>
+        </footer>
+    </div>
+
+    <script>
+        const subjectsBySemester = {{ subjects_by_semester | tojson }};
+
+        function createSubjectInputs() {
+            const semester = document.getElementById('semesterSelect').value;
+            const subjects = subjectsBySemester[semester];
+            const container = document.getElementById('subjectsContainer');
+            container.innerHTML = '';
+
+            subjects.forEach((subject, index) => {
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+
+                if (subject.isAnatomie) {
+                    card.innerHTML = `
+                        <h3>${subject.name} (Coeff: ${subject.coeff}, Cr: ${subject.credits})</h3>
+                        ${Array.from({length: 3}, (_, i) => `
+                            <div class="input-group">
+                                <input type="number" placeholder="DS ${i+1}" id="anat_ds${index}_${i}">
+                                <input type="number" placeholder="Exam ${i+1}" id="anat_exam${index}_${i}">
+                            </div>
+                        `).join('')}
+                    `;
+                } else if (subject.singleNote) {
+                    card.innerHTML = `
+                        <h3>${subject.name} (Coeff: ${subject.coeff}, Cr: ${subject.credits})</h3>
+                        <div class="input-group">
+                            <input type="number" placeholder="Note" id="note_${index}">
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <h3>${subject.name} (Coeff: ${subject.coeff}, Cr: ${subject.credits})</h3>
+                        <div class="input-group">
+                            <input type="number" placeholder="DS Note" id="ds_${index}">
+                            <input type="number" placeholder="Exam Note" id="exam_${index}">
+                        </div>
+                    `;
+                }
+                container.appendChild(card);
+            });
+        }
+
+        async function calculateAverage() {
+            const semester = document.getElementById('semesterSelect').value;
+            const subjects = subjectsBySemester[semester];
+            const inputData = {};
+
+            subjects.forEach((subject, index) => {
+                if (subject.isAnatomie) {
+                    inputData[index] = {};
+                    for (let i = 0; i < 3; i++) {
+                        inputData[index][`anat_ds_${i}`] = document.getElementById(`anat_ds${index}_${i}`)?.value || 0;
+                        inputData[index][`anat_exam_${i}`] = document.getElementById(`anat_exam${index}_${i}`)?.value || 0;
+                    }
+                } else if (subject.singleNote) {
+                    inputData[index] = {
+                        note: document.getElementById(`note_${index}`)?.value || 0
+                    };
+                } else {
+                    inputData[index] = {
+                        ds: document.getElementById(`ds_${index}`)?.value || 0,
+                        exam: document.getElementById(`exam_${index}`)?.value || 0
+                    };
+                }
+            });
+
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        semester: parseInt(semester),
+                        input_data: inputData
+                    }),
+                });
+
+                const result = await response.json();
+                
+                document.getElementById('result').innerHTML = `
+                    <h2>Semester Average: ${result.average.toFixed(2)}/20</h2>
+                    ${result.warnings.length > 0 ? `
+                        <div class="warnings">
+                            <h3>⚠️ Warnings:</h3>
+                            <ul>${result.warnings.map(w => `<li>${w}</li>`).join('')}</ul>
+                        </div>
+                    ` : ''}
+                `;
+
+                document.getElementById('creditsResult').innerHTML = `
+                    <div class="credits">
+                        <p>Total Credits: ${result.total_credits}</p>
+                        <p>Earned Credits: ${result.earned_credits}</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('semesterSelect').addEventListener('change', createSubjectInputs);
+        document.getElementById('calculateButton').addEventListener('click', calculateAverage);
+        
+        // Initial load
+        document.addEventListener('DOMContentLoaded', createSubjectInputs);
+    </script>
+</body>
+  </html>
