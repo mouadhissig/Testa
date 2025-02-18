@@ -1,5 +1,10 @@
 from flask import Flask, render_template, request, jsonify
 
+@app.route("/")
+def home():
+    return render_template("index.html", subjects_by_semester=subjects_by_semester)  # <-- Add this parameter
+
+
 app = Flask(__name__)
 
 # Complete subjects data
